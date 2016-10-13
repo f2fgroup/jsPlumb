@@ -1,17 +1,17 @@
 /*
  * jsPlumb
- * 
+ *
  * Title:jsPlumb 2.1.0
- * 
+ *
  * Provides a way to visually connect elements on an HTML page, using SVG.
- * 
+ *
  * This file contains the 'vanilla' adapter - having no external dependencies other than bundled libs.
  *
  * Copyright (c) 2010 - 2016 jsPlumb (hello@jsplumbtoolkit.com)
- * 
+ *
  * http://jsplumbtoolkit.com
  * http://github.com/sporritt/jsplumb
- * 
+ *
  * Dual licensed under the MIT and GPL2 licenses.
  */
 ;
@@ -20,6 +20,9 @@
     "use strict";
     var root = this, _jp = root.jsPlumb, _ju = root.jsPlumbUtil,
         _jk = root.Katavorio, _jg = root.Biltong;
+
+        var offsetsRootCache = {};
+        var offsetsCache = {};
 
     var _getDragManager = function (instance, category) {
 
@@ -33,10 +36,32 @@
                 bind: e.on,
                 unbind: e.off,
                 getSize: jsPlumb.getSize,
+                getRapidPosition: function(el, relativeToRoot) {
+                  if (el._katavorioDrag) {
+                    if (relativeToRoot) {
+                      return offsetsRootCache.hasOwnProperty(el) ? offsetsRootCache[el] : this.getPosition(el, relativeToRoot);
+                    } else {
+                      return offsetsCache.hasOwnProperty(el) ? offsetsCache[el] : this.getPosition(el, relativeToRoot);
+                    }
+                  } else {
+                    return this.getPosition(el, relativeToRoot);
+                  }
+                },
                 getPosition: function (el, relativeToRoot) {
                     // if this is a nested draggable then compute the offset against its own offsetParent, otherwise
                     // compute against the Container's origin. see also the getUIPosition method below.
-                    var o = instance.getOffset(el, relativeToRoot, el._katavorioDrag ? el.offsetParent : null);
+                    var p0 = null;
+                    if (el._katavorioDrag) {
+                      p0 = el.offsetParent;
+                    }
+                    var o = instance.getOffset(el, relativeToRoot, p0);
+                    if (el._katavorioDrag) {
+                      if (relativeToRoot) {
+                        offsetsRootCache[el] = [o.left, o.top];
+                      } else {
+                        offsetsCache[el] = [o.left, o.top];
+                      }
+                    }
                     return [o.left, o.top];
                 },
                 setPosition: function (el, xy) {
