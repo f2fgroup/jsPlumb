@@ -13496,15 +13496,7 @@
                 unbind: e.off,
                 getSize: jsPlumb.getSize,
                 getRapidPosition: function(el, relativeToRoot) {
-                  if (el._katavorioDrag) {
-                    if (relativeToRoot) {
-                      return offsetsRootCache.hasOwnProperty(el) ? offsetsRootCache[el] : this.getPosition(el, relativeToRoot);
-                    } else {
-                      return offsetsCache.hasOwnProperty(el) ? offsetsCache[el] : this.getPosition(el, relativeToRoot);
-                    }
-                  } else {
-                    return this.getPosition(el, relativeToRoot);
-                  }
+                  return this.getPosition(el, relativeToRoot);
                 },
                 getPosition: function (el, relativeToRoot) {
                     // if this is a nested draggable then compute the offset against its own offsetParent, otherwise
